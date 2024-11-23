@@ -19,7 +19,7 @@ By Gabriel Staples, http://www.ElectricRCAircraftGuy.com
 #define EU 0 //set by a LOW on REGIONSWITCH pin
 
 // What pins do what
-#define LED   TVT_STATUS_LED_PIN  //LED indicator pin (usually 13)
+#define LED   TVT_ONBOARD_LED_PIN //LED indicator pin (usually 13)
 #define IRLED TVT_IR_LED_PIN      //the IR sender LED 
 //#define TRIGGER 2       //the button pin; NB: this pin is "hard-coded" in the sleepNow() function in the primary .ino file by means of using external interrupt 0, which is hard-wired to pin 2
 //#define REGIONSWITCH 5  //HIGH (1) = NA, LOW (0) = EU; Pin 5 (REGIONSWITCH) is HIGH (via in input pullup resistor) for North America, or you (the user) must wire it to ground to set the codes for Europe.

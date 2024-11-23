@@ -34,14 +34,26 @@ void flashLed(int seconds, int ms = 500) {
         digitalWrite(TVT_ONBOARD_LED_PIN, HIGH);
 
         if (!buttonPressed) {
-            deepSleep(ms);
+            delay(ms);
         }
         
         analogWrite(TVT_STATUS_LED_PIN, 0);
         digitalWrite(TVT_ONBOARD_LED_PIN, LOW);
 
         if (!buttonPressed) {
-            deepSleep(ms);
+            delay(ms);
+        }
+    }
+}
+
+void pulseLed(int seconds, int ms = 500) {
+    int step = max(ms / TVT_STATUS_WARNING_BRIGHTNESS, 1);
+    
+    for (int i = 0; i < seconds * 1000 && !buttonPressed; i += ms * 2) {
+        for (int j = 0; j <= TVT_STATUS_WARNING_BRIGHTNESS * 2 && !buttonPressed; j++) {
+            float x = (sin((j / (TVT_STATUS_WARNING_BRIGHTNESS * 2.)) * (PI * 2.) - (PI / 2.)) + 1.) / 2.;
+            analogWrite(TVT_STATUS_LED_PIN, (int)(x * TVT_STATUS_WARNING_BRIGHTNESS));
+            delay(step);
         }
     }
 }
@@ -50,10 +62,13 @@ void resetTimer() {
     shutdownAt = currentTime + TVT_SLEEP_TIMER_SECONDS * 1000;
 }
 
-void shutdown() {
+void shutdown(bool finished = false) {
     delay(1000);
     buttonPressed = 0;
-    flashLed(3, 150);
+    
+    if (!finished) {
+        flashLed(3, 150);
+    }
 
     analogWrite(TVT_STATUS_LED_PIN, TVT_STATUS_WARNING_BRIGHTNESS);
     digitalWrite(TVT_ONBOARD_LED_PIN, HIGH);
@@ -61,13 +76,16 @@ void shutdown() {
     digitalWrite(TVT_SHUTDOWN_PIN, LOW);
     pinMode(TVT_SHUTDOWN_PIN, OUTPUT);
     
+    delay(10000);
+    
     while (true) {
-        delay(1000);
+        pulseLed(10, 250);
     }
 }
 
 void setup() {
     pinMode(TVT_ONBOARD_LED_PIN, OUTPUT);
+    pinMode(TVT_STATUS_LED_PIN, OUTPUT);
     
     // Set the shutdown pin in high impedance mode to avoid wasting power
     digitalWrite(TVT_SHUTDOWN_PIN, LOW);
@@ -110,7 +128,7 @@ void loop() {
     }
 
     if (shutdownAt < currentTime) {
-        flashLed(TVT_WARNING_BLINK_SECONDS);
+        pulseLed(TVT_WARNING_BLINK_SECONDS, TVT_STATUS_WARNING_INTERVAL);
         
         if (!buttonPressed) {
             sendAllCodes();
@@ -118,7 +136,7 @@ void loop() {
 
         if (!buttonPressed) {
             resetTimer();
-            shutdown();
+            shutdown(true);
         }
     }
 }

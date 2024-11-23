@@ -417,9 +417,9 @@ void delay_ten_us(uint16_t us) {
 // This function quickly pulses the visible LED (connected to PB0, pin 5)
 // This will indicate to the user that a code is being transmitted
 void quickflashLED( void ) {
-  analogWrite(LED, TVT_STATUS_SENDING_BRIGHTNESS);
+  digitalWrite(LED, HIGH);
   delay_ten_us(3000);   // 30 ms ON-time delay
-  analogWrite(LED, 0);
+  analogWrite(LED, LOW);
 }
 
 // This function just flashes the visible LED a couple times, used to
