@@ -10,10 +10,10 @@ extern void quickflashLEDx( uint8_t x );
 volatile int buttonPressed = 0;
 
 // When to start the TV shutdown
-unsigned long shutdownAt = 0;
+int64_t shutdownAt = 0;
 
 // Can't use millis() to count elapsed time since the deepsleep stops the CPU
-unsigned long currentTime = 0;
+int64_t currentTime = 0;
 
 void handleCalibrateButtonPress() {
     buttonPressed += 1;
@@ -28,8 +28,8 @@ void deepSleep(int ms) {
     currentTime += ms;
 }
 
-void flashLed(int seconds, int ms = 500) {
-    for (int i = 0; i < seconds * 1000 && !buttonPressed; i += ms * 2) {
+void flashLed(int64_t seconds, int ms = 500) {
+    for (int64_t i = 0; i < seconds * 1000 && !buttonPressed; i += ms * 2) {
         analogWrite(TVT_STATUS_LED_PIN, TVT_STATUS_WARNING_BRIGHTNESS);
         digitalWrite(TVT_ONBOARD_LED_PIN, HIGH);
 
@@ -46,12 +46,12 @@ void flashLed(int seconds, int ms = 500) {
     }
 }
 
-void pulseLed(int seconds, int ms = 500) {
+void pulseLed(int64_t seconds, int ms = 500) {
     int step = max(ms / TVT_STATUS_WARNING_BRIGHTNESS, 1);
     
-    for (int i = 0; i < seconds * 1000 && !buttonPressed; i += ms * 2) {
+    for (int64_t i = 0; i < seconds * 1000 && !buttonPressed; i += ms * 2) {
         for (int j = 0; j <= TVT_STATUS_WARNING_BRIGHTNESS * 2 && !buttonPressed; j++) {
-            float x = (sin((j / (TVT_STATUS_WARNING_BRIGHTNESS * 2.)) * (PI * 2.) - (PI / 2.)) + 1.) / 2.;
+            double x = (sin((j / (TVT_STATUS_WARNING_BRIGHTNESS * 2.)) * (PI * 2.) - (PI / 2.)) + 1.) / 2.;
             analogWrite(TVT_STATUS_LED_PIN, (int)(x * TVT_STATUS_WARNING_BRIGHTNESS));
             delay(step);
         }
